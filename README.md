@@ -1,7 +1,7 @@
 
   # VendorApp
 
-  This is a code bundle for VendorApp. The original project is available at https://www.figma.com/design/bNwoQgJkVonjbQayWg6P7p/VendorApp.
+  This is a code bundle for VendorApp.
 
   ## Running the code
 
