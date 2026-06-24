@@ -32,7 +32,6 @@ export function AppSidebar() {
     { name: "Dashboard", href: "/vendor/dashboard", icon: Home },
     { name: "Create PO", href: "/vendor/create-po", icon: ShoppingCart },
     { name: "Invoices", href: "/vendor/invoices", icon: FileText },
-    { name: "Rejections", href: "/vendor/invoices?filter=rejected", icon: XCircle },
     { name: "Reports", href: "/reports", icon: BarChart3 },
     { name: "Documents", href: "/documents", icon: FolderOpen },
     { name: "Settings", href: "/settings", icon: Settings },

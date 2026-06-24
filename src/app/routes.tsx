@@ -3,6 +3,8 @@ import { RootLayout } from "./layouts/root-layout";
 import { VendorDashboard } from "./pages/vendor/dashboard";
 import { CustomerDashboard } from "./pages/customer/dashboard";
 import { AdminDashboard } from "./pages/admin/dashboard";
+import { AdminUsers } from "./pages/admin/users";
+import { AdminLogs } from "./pages/admin/logs";
 import { CreatePO } from "./pages/vendor/create-po";
 import { InvoiceManagement } from "./pages/vendor/invoice-management";
 import { PODUpload } from "./pages/vendor/pod-upload";
@@ -34,6 +36,8 @@ export const router = createBrowserRouter([
       
       // Admin routes
       { path: "admin/dashboard", Component: AdminDashboard },
+      { path: "admin/users", Component: AdminUsers },
+      { path: "admin/logs", Component: AdminLogs },
       
       // Shared routes
       { path: "reports", Component: Reports },

@@ -4,6 +4,15 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "../..
 import { Badge } from "../../components/ui/badge";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "../../components/ui/table";
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts";
+import { Button } from "../../components/ui/button";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "../../components/ui/dialog";
 
 const systemStats = [
   { metric: "Total Users", value: 45 },
@@ -40,41 +49,57 @@ const systemLogs = [
 export function AdminDashboard() {
   return (
     <div className="space-y-8">
-      <div>
-        <h1 className="text-3xl font-bold">Admin Dashboard</h1>
-        <p className="mt-1 text-neutral-500">System overview and management</p>
-      </div>
-
-      {/* KPI Cards */}
-      <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
-        <KPICard
-          title="Total Users"
-          value="45"
-          icon={Users}
-          trend={{ value: "+5 this week", isPositive: true }}
-          color="bg-blue-600"
-        />
-        <KPICard
-          title="Active Sessions"
-          value="12"
-          icon={Activity}
-          trend={{ value: "Currently online", isPositive: true }}
-          color="bg-green-600"
-        />
-        <KPICard
-          title="Storage Used"
-          value="124 GB"
-          icon={Database}
-          trend={{ value: "62% capacity", isPositive: true }}
-          color="bg-purple-600"
-        />
-        <KPICard
-          title="System Health"
-          value="99.8%"
-          icon={Shield}
-          trend={{ value: "All systems operational", isPositive: true }}
-          color="bg-amber-600"
-        />
+      <div className="flex items-center justify-between">
+        <div>
+          <h1 className="text-3xl font-bold">Admin Dashboard</h1>
+          <p className="mt-1 text-neutral-500">System overview and management</p>
+        </div>
+        <Dialog>
+          <DialogTrigger asChild>
+            <Button variant="outline" className="gap-2 font-medium">
+              <Activity className="h-4 w-4" />
+              View KPI Metrics
+            </Button>
+          </DialogTrigger>
+          <DialogContent className="max-w-4xl">
+            <DialogHeader>
+              <DialogTitle>Admin KPI Metrics Overview</DialogTitle>
+              <DialogDescription>
+                System metrics overview, including total users, active sessions, and system health.
+              </DialogDescription>
+            </DialogHeader>
+            <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4 mt-4">
+              <KPICard
+                title="Total Users"
+                value="45"
+                icon={Users}
+                trend={{ value: "+5 this week", isPositive: true }}
+                color="bg-blue-600"
+              />
+              <KPICard
+                title="Active Sessions"
+                value="12"
+                icon={Activity}
+                trend={{ value: "Currently online", isPositive: true }}
+                color="bg-green-600"
+              />
+              <KPICard
+                title="Storage Used"
+                value="124 GB"
+                icon={Database}
+                trend={{ value: "62% capacity", isPositive: true }}
+                color="bg-purple-600"
+              />
+              <KPICard
+                title="System Health"
+                value="99.8%"
+                icon={Shield}
+                trend={{ value: "All systems operational", isPositive: true }}
+                color="bg-amber-600"
+              />
+            </div>
+          </DialogContent>
+        </Dialog>
       </div>
 
       {/* User Activity Chart */}

@@ -5,6 +5,14 @@ import { Button } from "../../components/ui/button";
 import { Badge } from "../../components/ui/badge";
 import { useNavigate } from "react-router";
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "../../components/ui/dialog";
 
 const approvalTrendData = [
   { month: "Jan", approved: 42, rejected: 8, pending: 5 },
@@ -37,38 +45,52 @@ export function CustomerDashboard() {
           <h1 className="text-3xl font-bold">Customer Dashboard</h1>
           <p className="mt-1 text-neutral-500">Welcome back, Zepto</p>
         </div>
-      </div>
-
-      {/* KPI Cards */}
-      <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
-        <KPICard
-          title="Pending Reviews"
-          value="8"
-          icon={Clock}
-          trend={{ value: "3 urgent items", isPositive: false }}
-          color="bg-amber-600"
-        />
-        <KPICard
-          title="Approved This Month"
-          value="61"
-          icon={CheckCircle}
-          trend={{ value: "+12% from last month", isPositive: true }}
-          color="bg-green-600"
-        />
-        <KPICard
-          title="Rejected This Month"
-          value="4"
-          icon={XCircle}
-          trend={{ value: "-2 from last month", isPositive: true }}
-          color="bg-red-600"
-        />
-        <KPICard
-          title="Pending Resubmissions"
-          value="3"
-          icon={AlertTriangle}
-          trend={{ value: "Awaiting vendor action", isPositive: false }}
-          color="bg-purple-600"
-        />
+        <Dialog>
+          <DialogTrigger asChild>
+            <Button variant="outline" className="gap-2 font-medium">
+              <TrendingDown className="h-4 w-4" />
+              View KPI Metrics
+            </Button>
+          </DialogTrigger>
+          <DialogContent className="max-w-4xl">
+            <DialogHeader>
+              <DialogTitle>Customer KPI Metrics Overview</DialogTitle>
+              <DialogDescription>
+                Overview of pending reviews, approvals, rejections, and resubmissions.
+              </DialogDescription>
+            </DialogHeader>
+            <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4 mt-4">
+              <KPICard
+                title="Pending Reviews"
+                value="8"
+                icon={Clock}
+                trend={{ value: "3 urgent items", isPositive: false }}
+                color="bg-amber-600"
+              />
+              <KPICard
+                title="Approved This Month"
+                value="61"
+                icon={CheckCircle}
+                trend={{ value: "+12% from last month", isPositive: true }}
+                color="bg-green-600"
+              />
+              <KPICard
+                title="Rejected This Month"
+                value="4"
+                icon={XCircle}
+                trend={{ value: "-2 from last month", isPositive: true }}
+                color="bg-red-600"
+              />
+              <KPICard
+                title="Pending Resubmissions"
+                value="3"
+                icon={AlertTriangle}
+                trend={{ value: "Awaiting vendor action", isPositive: false }}
+                color="bg-purple-600"
+              />
+            </div>
+          </DialogContent>
+        </Dialog>
       </div>
 
       {/* Chart */}

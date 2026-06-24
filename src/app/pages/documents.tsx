@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Search, Filter, Download, Eye, FileText, LayoutGrid, LayoutList, FolderOpen } from "lucide-react";
+import { Search, Filter, Download, Eye, FileText, LayoutGrid, LayoutList, FolderOpen, CheckCircle } from "lucide-react";
 import { Button } from "../components/ui/button";
 import { Input } from "../components/ui/input";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "../components/ui/card";
@@ -20,6 +20,14 @@ import {
   TableHeader,
   TableRow,
 } from "../components/ui/table";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+} from "../components/ui/dialog";
+import { toast } from "sonner";
 
 const documents = [
   {
@@ -82,6 +90,7 @@ const documents = [
 export function Documents() {
   const [viewMode, setViewMode] = useState<"grid" | "list">("list");
   const [filterType, setFilterType] = useState("all");
+  const [previewDoc, setPreviewDoc] = useState<any | null>(null);
 
   const filteredDocuments = filterType === "all"
     ? documents
@@ -222,10 +231,10 @@ export function Documents() {
                       </div>
                       <p className="text-xs text-neutral-500">{doc.size}</p>
                       <div className="flex gap-1 pt-2">
-                        <Button variant="outline" size="sm" className="flex-1">
+                        <Button variant="outline" size="sm" className="flex-1" onClick={() => setPreviewDoc(doc)}>
                           <Eye className="h-3 w-3" />
                         </Button>
-                        <Button variant="outline" size="sm" className="flex-1">
+                        <Button variant="outline" size="sm" className="flex-1" onClick={() => toast.success(`Downloading ${doc.name}...`)}>
                           <Download className="h-3 w-3" />
                         </Button>
                       </div>
@@ -268,10 +277,10 @@ export function Documents() {
                       <TableCell>{getStatusBadge(doc.status)}</TableCell>
                       <TableCell>
                         <div className="flex gap-2">
-                          <Button variant="ghost" size="icon">
+                          <Button variant="ghost" size="icon" onClick={() => setPreviewDoc(doc)}>
                             <Eye className="h-4 w-4" />
                           </Button>
-                          <Button variant="ghost" size="icon">
+                          <Button variant="ghost" size="icon" onClick={() => toast.success(`Downloading ${doc.name}...`)}>
                             <Download className="h-4 w-4" />
                           </Button>
                         </div>
@@ -284,6 +293,113 @@ export function Documents() {
           )}
         </CardContent>
       </Card>
+
+      <Dialog open={!!previewDoc} onOpenChange={(open) => !open && setPreviewDoc(null)}>
+        <DialogContent className="sm:max-w-xl">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <FileText className="h-5 w-5 text-blue-600" />
+              Document Preview
+            </DialogTitle>
+            <DialogDescription>
+              Viewing {previewDoc?.name} ({previewDoc?.type})
+            </DialogDescription>
+          </DialogHeader>
+          
+          {previewDoc && (
+            <div className="space-y-4 py-4">
+              <div className="grid grid-cols-2 gap-4 rounded-lg bg-neutral-50 p-4 text-sm">
+                <div>
+                  <span className="text-neutral-500 block">Document Name</span>
+                  <span className="font-medium text-neutral-900">{previewDoc.name}</span>
+                </div>
+                <div>
+                  <span className="text-neutral-500 block">Associated PO</span>
+                  <span className="font-medium text-neutral-900">{previewDoc.po}</span>
+                </div>
+                <div>
+                  <span className="text-neutral-500 block">Store Location</span>
+                  <span className="font-medium text-neutral-900">{previewDoc.store}</span>
+                </div>
+                <div>
+                  <span className="text-neutral-500 block">File Size</span>
+                  <span className="font-medium text-neutral-900">{previewDoc.size}</span>
+                </div>
+                <div>
+                  <span className="text-neutral-500 block">Uploaded By</span>
+                  <span className="font-medium text-neutral-900">{previewDoc.uploadedBy}</span>
+                </div>
+                <div>
+                  <span className="text-neutral-500 block">Upload Date</span>
+                  <span className="font-medium text-neutral-900">{previewDoc.uploadedDate}</span>
+                </div>
+              </div>
+
+              <div className="rounded-lg border bg-white p-6 shadow-xs min-h-[250px] flex flex-col justify-between">
+                {previewDoc.type === "Invoice" ? (
+                  <div className="space-y-4">
+                    <div className="flex justify-between items-start border-b pb-4">
+                      <div>
+                        <h4 className="text-lg font-bold text-neutral-800">INVOICE</h4>
+                        <span className="text-xs text-neutral-500">{previewDoc.name.replace(".pdf", "")}</span>
+                      </div>
+                      <div className="text-right">
+                        <span className="text-sm font-semibold text-neutral-800">DDAPL India</span>
+                        <p className="text-xs text-neutral-500">Bandra West, Mumbai</p>
+                      </div>
+                    </div>
+                    <div className="space-y-2 text-xs">
+                      <div className="flex justify-between">
+                        <span className="text-neutral-500">Bill To:</span>
+                        <span className="font-medium text-neutral-800">Retail Distribution Corp</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span className="text-neutral-500">PO Number:</span>
+                        <span className="font-medium text-neutral-800">{previewDoc.po}</span>
+                      </div>
+                      <div className="flex justify-between border-t pt-2 mt-2 font-medium">
+                        <span>Description</span>
+                        <span>Amount</span>
+                      </div>
+                      <div className="flex justify-between text-neutral-600">
+                        <span>Device Batch Purchase (Qty: 50)</span>
+                        <span>₹12,45,000.00</span>
+                      </div>
+                    </div>
+                  </div>
+                ) : (
+                  <div className="space-y-4">
+                    <div className="flex justify-between items-start border-b pb-4">
+                      <div>
+                        <h4 className="text-lg font-bold text-neutral-800">PROOF OF DELIVERY</h4>
+                        <span className="text-xs text-neutral-500">{previewDoc.name}</span>
+                      </div>
+                      <div className="text-right">
+                        <span className="text-xs font-semibold text-green-600 uppercase border border-green-200 bg-green-50 px-2 py-0.5 rounded">
+                          Delivered
+                        </span>
+                      </div>
+                    </div>
+                    
+                    <div className="rounded-md border bg-neutral-50 p-4 text-center">
+                      <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-blue-100 mb-2">
+                        <CheckCircle className="h-6 w-6 text-blue-600" />
+                      </div>
+                      <p className="text-sm font-medium text-neutral-800">Delivery Receipt Scan Attached</p>
+                      <p className="text-xs text-neutral-400 mt-1">Recipient Signature: Verified</p>
+                    </div>
+                  </div>
+                )}
+
+                <div className="mt-6 flex justify-between items-center text-xs text-neutral-400 border-t pt-4">
+                  <span>DDAPL Management System</span>
+                  <span className="text-green-600 font-medium">Verified Document</span>
+                </div>
+              </div>
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }
