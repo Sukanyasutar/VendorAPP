@@ -95,7 +95,7 @@ export function AppSidebar() {
                 <SidebarMenuItem key={item.name}>
                   <SidebarMenuButton
                     onClick={() => navigate(item.href)}
-                    isActive={location.pathname === item.href}
+                    isActive={location.pathname + location.search === item.href}
                   >
                     <item.icon className="h-4 w-4" />
                     <span>{item.name}</span>

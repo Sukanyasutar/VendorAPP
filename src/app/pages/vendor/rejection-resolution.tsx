@@ -47,7 +47,7 @@ export function RejectionResolution() {
             <span>/</span>
             <span className="text-neutral-600">Rejection Resolution</span>
           </div>
-          <h1 className="text-2xl font-bold tracking-tight text-neutral-900 mt-1">Rejection Resolution</h1>
+          <h1 className="text-xl font-bold tracking-tight text-neutral-900 mt-1">Rejection Resolution</h1>
           <p className="text-sm text-neutral-500">Resolve issues and resubmit invoice</p>
         </div>
         <Button

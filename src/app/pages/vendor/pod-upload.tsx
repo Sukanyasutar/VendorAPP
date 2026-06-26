@@ -111,7 +111,7 @@ export function PODUpload() {
   return (
     <div className="mx-auto max-w-4xl space-y-8">
       <div>
-        <h1 className="text-3xl font-bold">Upload Proof of Delivery</h1>
+        <h1 className="text-xl font-bold">Upload Proof of Delivery</h1>
         <p className="mt-1 text-neutral-500">Invoice: {invoiceId}</p>
       </div>
 

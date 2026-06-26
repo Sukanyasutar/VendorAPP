@@ -40,7 +40,7 @@ export function AdminLogs() {
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold">System Activity Logs</h1>
+          <h1 className="text-xl font-bold">System Activity Logs</h1>
           <p className="mt-1 text-neutral-500">Track actions, logins, and system events</p>
         </div>
         <Button variant="destructive" onClick={handleClearLogs} disabled={logs.length === 0}>

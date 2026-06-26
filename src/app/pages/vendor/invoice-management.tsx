@@ -106,6 +106,7 @@ const mockPOs = [
 export function InvoiceManagement() {
   const navigate = useNavigate();
   const [statusFilter, setStatusFilter] = useState("all");
+  const [searchQuery, setSearchQuery] = useState("");
   const [invoicesList, setInvoicesList] = useState(invoices);
 
   // Upload Invoice Form State
@@ -256,15 +257,22 @@ export function InvoiceManagement() {
     }
   };
 
-  const filteredInvoices = statusFilter === "all"
-    ? invoicesList
-    : invoicesList.filter((inv) => inv.status === statusFilter);
+  const filteredInvoices = invoicesList.filter((inv) => {
+    const matchesStatus = statusFilter === "all" || inv.status === statusFilter;
+    const query = searchQuery.toLowerCase().trim();
+    const matchesSearch = !query || 
+      inv.id.toLowerCase().includes(query) ||
+      inv.po.toLowerCase().includes(query) ||
+      inv.store.toLowerCase().includes(query) ||
+      inv.customerName.toLowerCase().includes(query);
+    return matchesStatus && matchesSearch;
+  });
 
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold">Invoice Management</h1>
+          <h1 className="text-xl font-bold">Invoice Management</h1>
           <p className="mt-1 text-neutral-500">Manage and track all invoices</p>
         </div>
         <div className="flex gap-3">
@@ -275,7 +283,7 @@ export function InvoiceManagement() {
                 View Metrics
               </Button>
             </DialogTrigger>
-            <DialogContent className="max-w-4xl">
+            <DialogContent className="sm:max-w-4xl">
               <DialogHeader>
                 <DialogTitle>Invoice Metrics Overview</DialogTitle>
                 <DialogDescription>
@@ -484,7 +492,12 @@ export function InvoiceManagement() {
           <div className="mb-6 flex gap-4">
             <div className="relative flex-1">
               <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-neutral-400" />
-              <Input placeholder="Search by invoice, PO, or store..." className="pl-10" />
+              <Input 
+                placeholder="Search by invoice, PO, or store..." 
+                className="pl-10" 
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+              />
             </div>
             <Select value={statusFilter} onValueChange={setStatusFilter}>
               <SelectTrigger className="w-40">
@@ -497,9 +510,14 @@ export function InvoiceManagement() {
                 <SelectItem value="rejected">Rejected</SelectItem>
               </SelectContent>
             </Select>
-            <Button variant="outline">
-              <Filter className="mr-2 h-4 w-4" />
-              More Filters
+            <Button 
+              variant="outline"
+              onClick={() => {
+                setSearchQuery("");
+                setStatusFilter("all");
+              }}
+            >
+              Reset Filters
             </Button>
           </div>
 

@@ -4,6 +4,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "../co
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "../components/ui/select";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "../components/ui/tabs";
 import { BarChart, Bar, LineChart, Line, PieChart, Pie, Cell, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend } from "recharts";
+import { toast } from "sonner";
 
 const poSummaryData = [
   { month: "Jan", total: 45, approved: 38, rejected: 7 },
@@ -40,7 +41,7 @@ export function Reports() {
     <div className="space-y-8">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold">Reports & Analytics</h1>
+          <h1 className="text-xl font-bold">Reports & Analytics</h1>
           <p className="mt-1 text-neutral-500">Comprehensive business insights</p>
         </div>
         <div className="flex gap-3">
@@ -56,7 +57,7 @@ export function Reports() {
               <SelectItem value="thisYear">This Year</SelectItem>
             </SelectContent>
           </Select>
-          <Button>
+          <Button onClick={() => toast.success("Exporting report in CSV format...")}>
             <Download className="mr-2 h-4 w-4" />
             Export Report
           </Button>

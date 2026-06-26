@@ -3,7 +3,7 @@ import { KPICard } from "../../components/dashboard/kpi-card";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "../../components/ui/card";
 import { Button } from "../../components/ui/button";
 import { Badge } from "../../components/ui/badge";
-import { useNavigate } from "react-router";
+import { useNavigate, useSearchParams } from "react-router";
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts";
 import {
   Dialog,
@@ -37,12 +37,23 @@ const recentApprovals = [
 
 export function CustomerDashboard() {
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  const filter = searchParams.get("filter");
+
+  const displayRecentApprovals = filter === "approved"
+    ? recentApprovals.filter((item) => item.status === "approved")
+    : filter === "rejected"
+    ? recentApprovals.filter((item) => item.status === "rejected")
+    : recentApprovals;
+
+  const showPendingQueue = !filter || filter === "pending";
+  const showRecentActivity = !filter || filter === "approved" || filter === "rejected";
 
   return (
     <div className="space-y-8">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold">Customer Dashboard</h1>
+          <h1 className="text-xl font-bold">Customer Dashboard</h1>
           <p className="mt-1 text-neutral-500">Welcome back, Zepto</p>
         </div>
         <Dialog>
@@ -52,7 +63,7 @@ export function CustomerDashboard() {
               View KPI Metrics
             </Button>
           </DialogTrigger>
-          <DialogContent className="max-w-4xl">
+          <DialogContent className="sm:max-w-4xl">
             <DialogHeader>
               <DialogTitle>Customer KPI Metrics Overview</DialogTitle>
               <DialogDescription>
@@ -94,95 +105,113 @@ export function CustomerDashboard() {
       </div>
 
       {/* Chart */}
-      <Card>
-        <CardHeader>
-          <CardTitle>Approval Trend Analysis</CardTitle>
-          <CardDescription>Invoice review status over time</CardDescription>
-        </CardHeader>
-        <CardContent>
-          <ResponsiveContainer width="100%" height={300}>
-            <LineChart data={approvalTrendData}>
-              <CartesianGrid key="grid" strokeDasharray="3 3" />
-              <XAxis key="xaxis" dataKey="month" />
-              <YAxis key="yaxis" />
-              <Tooltip key="tooltip" />
-              <Line key="approved" type="monotone" dataKey="approved" stroke="#10b981" strokeWidth={2} />
-              <Line key="rejected" type="monotone" dataKey="rejected" stroke="#ef4444" strokeWidth={2} />
-              <Line key="pending" type="monotone" dataKey="pending" stroke="#f59e0b" strokeWidth={2} />
-            </LineChart>
-          </ResponsiveContainer>
-        </CardContent>
-      </Card>
-
-      <div className="grid gap-6 lg:grid-cols-2">
-        {/* Pending Approval Queue */}
+      {!filter && (
         <Card>
           <CardHeader>
-            <CardTitle>Pending Approval Queue</CardTitle>
-            <CardDescription>Invoices awaiting your review</CardDescription>
+            <CardTitle>Approval Trend Analysis</CardTitle>
+            <CardDescription>Invoice review status over time</CardDescription>
           </CardHeader>
           <CardContent>
-            <div className="space-y-4">
-              {pendingReviews.map((item) => (
-                <div key={item.id} className="flex items-center gap-4 rounded-lg border p-4">
-                  <div className="flex-1">
-                    <div className="flex items-center gap-2">
-                      <p className="font-medium">{item.invoice}</p>
-                      <Badge variant={item.priority === "high" ? "destructive" : "secondary"} className="text-xs">
-                        {item.priority}
-                      </Badge>
-                    </div>
-                    <p className="text-sm text-neutral-500">{item.store}</p>
-                    <div className="mt-1 flex items-center gap-4 text-xs text-neutral-400">
-                      <span>{item.amount}</span>
-                      <span>•</span>
-                      <span>Submitted {item.submittedDate}</span>
-                    </div>
-                  </div>
-                  <Button size="sm" onClick={() => navigate(`/customer/review/${item.id}`)}>
-                    Review
-                  </Button>
-                </div>
-              ))}
-            </div>
-            <Button variant="outline" className="mt-4 w-full">
-              View All Pending ({pendingReviews.length})
-            </Button>
+            <ResponsiveContainer width="100%" height={300}>
+              <LineChart data={approvalTrendData}>
+                <CartesianGrid key="grid" strokeDasharray="3 3" />
+                <XAxis key="xaxis" dataKey="month" />
+                <YAxis key="yaxis" />
+                <Tooltip key="tooltip" />
+                <Line key="approved" type="monotone" dataKey="approved" stroke="#10b981" strokeWidth={2} />
+                <Line key="rejected" type="monotone" dataKey="rejected" stroke="#ef4444" strokeWidth={2} />
+                <Line key="pending" type="monotone" dataKey="pending" stroke="#f59e0b" strokeWidth={2} />
+              </LineChart>
+            </ResponsiveContainer>
           </CardContent>
         </Card>
+      )}
+
+      <div className={`grid gap-6 ${filter ? "grid-cols-1" : "lg:grid-cols-2"}`}>
+        {/* Pending Approval Queue */}
+        {showPendingQueue && (
+          <Card>
+            <CardHeader>
+              <CardTitle>Pending Approval Queue</CardTitle>
+              <CardDescription>Invoices awaiting your review</CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-4">
+                {pendingReviews.map((item) => (
+                  <div key={item.id} className="flex items-center gap-4 rounded-lg border p-4">
+                    <div className="flex-1">
+                      <div className="flex items-center gap-2">
+                        <p className="font-medium">{item.invoice}</p>
+                        <Badge variant={item.priority === "high" ? "destructive" : "secondary"} className="text-xs">
+                          {item.priority}
+                        </Badge>
+                      </div>
+                      <p className="text-sm text-neutral-500">{item.store}</p>
+                      <div className="mt-1 flex items-center gap-4 text-xs text-neutral-400">
+                        <span>{item.amount}</span>
+                        <span>•</span>
+                        <span>Submitted {item.submittedDate}</span>
+                      </div>
+                    </div>
+                    <Button size="sm" onClick={() => navigate(`/customer/review/${item.id}`)}>
+                      Review
+                    </Button>
+                  </div>
+                ))}
+              </div>
+              <Button variant="outline" className="mt-4 w-full">
+                View All Pending ({pendingReviews.length})
+              </Button>
+            </CardContent>
+          </Card>
+        )}
 
         {/* Recent Activity */}
-        <Card>
-          <CardHeader>
-            <CardTitle>Recent Activity</CardTitle>
-            <CardDescription>Your latest review actions</CardDescription>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-4">
-              {recentApprovals.map((activity) => (
-                <div key={activity.id} className="flex items-start gap-4 border-b pb-4 last:border-0">
-                  <div className="flex h-10 w-10 items-center justify-center rounded-full bg-neutral-100">
-                    {activity.status === "approved" ? (
-                      <CheckCircle className="h-5 w-5 text-green-600" />
-                    ) : (
-                      <XCircle className="h-5 w-5 text-red-600" />
-                    )}
+        {showRecentActivity && (
+          <Card>
+            <CardHeader>
+              <CardTitle>
+                {filter === "approved" 
+                  ? "Approved Invoices" 
+                  : filter === "rejected" 
+                  ? "Rejected Invoices" 
+                  : "Recent Activity"}
+              </CardTitle>
+              <CardDescription>
+                {filter === "approved" 
+                  ? "Your recently approved invoice reviews" 
+                  : filter === "rejected" 
+                  ? "Your recently rejected invoice reviews" 
+                  : "Your latest review actions"}
+              </CardDescription>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-4">
+                {displayRecentApprovals.map((activity) => (
+                  <div key={activity.id} className="flex items-start gap-4 border-b pb-4 last:border-0">
+                    <div className="flex h-10 w-10 items-center justify-center rounded-full bg-neutral-100">
+                      {activity.status === "approved" ? (
+                        <CheckCircle className="h-5 w-5 text-green-600" />
+                      ) : (
+                        <XCircle className="h-5 w-5 text-red-600" />
+                      )}
+                    </div>
+                    <div className="flex-1">
+                      <p className="font-medium">{activity.invoice}</p>
+                      <p className="text-sm text-neutral-500">{activity.store}</p>
+                      <p className="text-xs text-neutral-400">{activity.time}</p>
+                    </div>
+                    <Badge
+                      variant={activity.status === "approved" ? "default" : "destructive"}
+                    >
+                      {activity.action}
+                    </Badge>
                   </div>
-                  <div className="flex-1">
-                    <p className="font-medium">{activity.invoice}</p>
-                    <p className="text-sm text-neutral-500">{activity.store}</p>
-                    <p className="text-xs text-neutral-400">{activity.time}</p>
-                  </div>
-                  <Badge
-                    variant={activity.status === "approved" ? "default" : "destructive"}
-                  >
-                    {activity.action}
-                  </Badge>
-                </div>
-              ))}
-            </div>
-          </CardContent>
-        </Card>
+                ))}
+              </div>
+            </CardContent>
+          </Card>
+        )}
       </div>
 
       {/* Quick Stats */}

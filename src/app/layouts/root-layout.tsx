@@ -6,8 +6,9 @@ import { SidebarProvider } from "../components/ui/sidebar";
 export function RootLayout() {
   const location = useLocation();
   const isRoleSelection = location.pathname === "/";
+  const isInvoiceReview = location.pathname.includes("/customer/review/");
 
-  if (isRoleSelection) {
+  if (isRoleSelection || isInvoiceReview) {
     return <Outlet />;
   }
 

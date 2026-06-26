@@ -1,4 +1,5 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useSearchParams } from "react-router";
 import { Search, Filter, Download, Eye, FileText, LayoutGrid, LayoutList, FolderOpen, CheckCircle } from "lucide-react";
 import { Button } from "../components/ui/button";
 import { Input } from "../components/ui/input";
@@ -88,13 +89,45 @@ const documents = [
 ];
 
 export function Documents() {
+  const [searchParams, setSearchParams] = useSearchParams();
+  const filterQuery = searchParams.get("filter");
+  
   const [viewMode, setViewMode] = useState<"grid" | "list">("list");
-  const [filterType, setFilterType] = useState("all");
+  const [filterType, setFilterType] = useState(filterQuery || "all");
   const [previewDoc, setPreviewDoc] = useState<any | null>(null);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [filterStatus, setFilterStatus] = useState("all");
 
-  const filteredDocuments = filterType === "all"
-    ? documents
-    : documents.filter((doc) => doc.type.toLowerCase() === filterType);
+  useEffect(() => {
+    if (filterQuery) {
+      setFilterType(filterQuery);
+    } else {
+      setFilterType("all");
+    }
+  }, [filterQuery]);
+
+  const handleFilterTypeChange = (value: string) => {
+    setFilterType(value);
+    if (value === "all") {
+      searchParams.delete("filter");
+    } else {
+      searchParams.set("filter", value);
+    }
+    setSearchParams(searchParams);
+  };
+
+  const filteredDocuments = documents.filter((doc) => {
+    const matchesType = filterType === "all" || doc.type.toLowerCase() === filterType.toLowerCase();
+    const matchesStatus = filterStatus === "all" || doc.status.toLowerCase() === filterStatus.toLowerCase();
+    const query = searchQuery.toLowerCase().trim();
+    const matchesSearch = !query || 
+      doc.name.toLowerCase().includes(query) ||
+      doc.po.toLowerCase().includes(query) ||
+      doc.store.toLowerCase().includes(query) ||
+      doc.type.toLowerCase().includes(query);
+
+    return matchesType && matchesStatus && matchesSearch;
+  });
 
   const getStatusBadge = (status: string) => {
     switch (status) {
@@ -119,38 +152,68 @@ export function Documents() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-3xl font-bold">Document Center</h1>
+        <h1 className="text-xl font-bold">Document Center</h1>
         <p className="mt-1 text-neutral-500">Manage and search all documents</p>
       </div>
 
       {/* Stats */}
       <div className="grid gap-4 md:grid-cols-4">
-        <Card>
-          <CardContent className="p-6">
-            <div className="text-sm text-neutral-500">Total Documents</div>
-            <div className="mt-2 text-2xl font-semibold">{documents.length}</div>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardContent className="p-6">
-            <div className="text-sm text-neutral-500">Invoices</div>
-            <div className="mt-2 text-2xl font-semibold">
-              {documents.filter((d) => d.type === "Invoice").length}
-            </div>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardContent className="p-6">
-            <div className="text-sm text-neutral-500">POD Documents</div>
-            <div className="mt-2 text-2xl font-semibold">
-              {documents.filter((d) => d.type === "POD").length}
-            </div>
-          </CardContent>
-        </Card>
-        <Card>
-          <CardContent className="p-6">
-            <div className="text-sm text-neutral-500">Total Size</div>
-            <div className="mt-2 text-2xl font-semibold">4.2 MB</div>
+        <button
+          onClick={() => handleFilterTypeChange("all")}
+          className="text-left w-full block focus:outline-hidden focus-visible:ring-2 focus-visible:ring-blue-500 rounded-xl cursor-pointer"
+        >
+          <Card className={`transition-all duration-200 ${
+            filterType === "all" 
+              ? "border-blue-600 bg-blue-50/20 ring-1 ring-blue-600/30 shadow-xs" 
+              : "border-neutral-200/70 hover:border-neutral-300 hover:bg-neutral-50/40"
+          }`}>
+            <CardContent className="p-4">
+              <div className="text-xs text-neutral-500 font-medium">Total Documents</div>
+              <div className="mt-1 text-2xl font-bold">{documents.length}</div>
+            </CardContent>
+          </Card>
+        </button>
+
+        <button
+          onClick={() => handleFilterTypeChange("invoice")}
+          className="text-left w-full block focus:outline-hidden focus-visible:ring-2 focus-visible:ring-blue-500 rounded-xl cursor-pointer"
+        >
+          <Card className={`transition-all duration-200 ${
+            filterType === "invoice" 
+              ? "border-blue-600 bg-blue-50/20 ring-1 ring-blue-600/30 shadow-xs" 
+              : "border-neutral-200/70 hover:border-neutral-300 hover:bg-neutral-50/40"
+          }`}>
+            <CardContent className="p-4">
+              <div className="text-xs text-neutral-500 font-medium">Invoices</div>
+              <div className="mt-1 text-2xl font-bold">
+                {documents.filter((d) => d.type === "Invoice").length}
+              </div>
+            </CardContent>
+          </Card>
+        </button>
+
+        <button
+          onClick={() => handleFilterTypeChange("pod")}
+          className="text-left w-full block focus:outline-hidden focus-visible:ring-2 focus-visible:ring-blue-500 rounded-xl cursor-pointer"
+        >
+          <Card className={`transition-all duration-200 ${
+            filterType === "pod" 
+              ? "border-blue-600 bg-blue-50/20 ring-1 ring-blue-600/30 shadow-xs" 
+              : "border-neutral-200/70 hover:border-neutral-300 hover:bg-neutral-50/40"
+          }`}>
+            <CardContent className="p-4">
+              <div className="text-xs text-neutral-500 font-medium">POD Documents</div>
+              <div className="mt-1 text-2xl font-bold">
+                {documents.filter((d) => d.type === "POD").length}
+              </div>
+            </CardContent>
+          </Card>
+        </button>
+
+        <Card className="border-neutral-200/70">
+          <CardContent className="p-4">
+            <div className="text-xs text-neutral-500 font-medium">Total Size</div>
+            <div className="mt-1 text-2xl font-bold text-neutral-900">4.2 MB</div>
           </CardContent>
         </Card>
       </div>
@@ -185,9 +248,14 @@ export function Documents() {
           <div className="mb-6 flex gap-4">
             <div className="relative flex-1">
               <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-neutral-400" />
-              <Input placeholder="Search by PO, invoice, or store..." className="pl-10" />
+              <Input 
+                placeholder="Search by PO, invoice, or store..." 
+                className="pl-10" 
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+              />
             </div>
-            <Select value={filterType} onValueChange={setFilterType}>
+            <Select value={filterType} onValueChange={handleFilterTypeChange}>
               <SelectTrigger className="w-40">
                 <SelectValue placeholder="Document type" />
               </SelectTrigger>
@@ -197,7 +265,7 @@ export function Documents() {
                 <SelectItem value="pod">POD</SelectItem>
               </SelectContent>
             </Select>
-            <Select defaultValue="all">
+            <Select value={filterStatus} onValueChange={setFilterStatus}>
               <SelectTrigger className="w-40">
                 <SelectValue placeholder="Status" />
               </SelectTrigger>
@@ -208,9 +276,15 @@ export function Documents() {
                 <SelectItem value="rejected">Rejected</SelectItem>
               </SelectContent>
             </Select>
-            <Button variant="outline">
-              <Filter className="mr-2 h-4 w-4" />
-              More Filters
+            <Button 
+              variant="outline"
+              onClick={() => {
+                setSearchQuery("");
+                setFilterStatus("all");
+                handleFilterTypeChange("all");
+              }}
+            >
+              Reset Filters
             </Button>
           </div>
 

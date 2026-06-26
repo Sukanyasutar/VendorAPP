@@ -1,4 +1,5 @@
 import { Users, FileText, Activity, Settings, Shield, Database } from "lucide-react";
+import { useNavigate } from "react-router";
 import { KPICard } from "../../components/dashboard/kpi-card";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "../../components/ui/card";
 import { Badge } from "../../components/ui/badge";
@@ -47,11 +48,12 @@ const systemLogs = [
 ];
 
 export function AdminDashboard() {
+  const navigate = useNavigate();
   return (
     <div className="space-y-8">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-3xl font-bold">Admin Dashboard</h1>
+          <h1 className="text-xl font-bold">Admin Dashboard</h1>
           <p className="mt-1 text-neutral-500">System overview and management</p>
         </div>
         <Dialog>
@@ -61,7 +63,7 @@ export function AdminDashboard() {
               View KPI Metrics
             </Button>
           </DialogTrigger>
-          <DialogContent className="max-w-4xl">
+          <DialogContent className="sm:max-w-4xl">
             <DialogHeader>
               <DialogTitle>Admin KPI Metrics Overview</DialogTitle>
               <DialogDescription>
@@ -127,8 +129,15 @@ export function AdminDashboard() {
         {/* User Management */}
         <Card>
           <CardHeader>
-            <CardTitle>User Management</CardTitle>
-            <CardDescription>Recent user activity</CardDescription>
+            <div className="flex items-center justify-between">
+              <div>
+                <CardTitle>User Management</CardTitle>
+                <CardDescription>Recent user activity</CardDescription>
+              </div>
+              <Button variant="ghost" size="sm" className="text-xs" onClick={() => navigate("/admin/users")}>
+                View All
+              </Button>
+            </div>
           </CardHeader>
           <CardContent>
             <div className="space-y-4">
@@ -185,8 +194,15 @@ export function AdminDashboard() {
       {/* System Logs */}
       <Card>
         <CardHeader>
-          <CardTitle>System Activity Logs</CardTitle>
-          <CardDescription>Recent system events and actions</CardDescription>
+          <div className="flex items-center justify-between">
+            <div>
+              <CardTitle>System Activity Logs</CardTitle>
+              <CardDescription>Recent system events and actions</CardDescription>
+            </div>
+            <Button variant="ghost" size="sm" className="text-xs" onClick={() => navigate("/admin/logs")}>
+              View All
+            </Button>
+          </div>
         </CardHeader>
         <CardContent>
           <Table>
